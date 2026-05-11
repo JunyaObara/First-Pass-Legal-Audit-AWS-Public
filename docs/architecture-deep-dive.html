@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Architecture Deep Dive | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="architecture-deep-dive.md">Markdown source</a>
+    </nav>
+<h1>Architecture Deep Dive</h1>
+<h2>Executive Summary</h2>
+<p>CloudNative GenAI Compliance Review on AWS is a first-pass compliance triage PoC for English software-spec fragments across BIPA, CIPA, and VPPA. It uses event-driven AWS orchestration, statute-grounded retrieval, deterministic adjudication, and Human-in-the-Loop approval so the AI system supports review rather than replacing accountable legal or business judgment.</p>
+<p>This page is meant to show not only which AWS services are used, but why they are composed this way: event-driven ingestion, visible orchestration, managed retrieval, isolated stages, stateful approvals, evidence storage, and observability.</p>
+<p>This public version is intentionally concise.</p>
+<h2>Architecture At A Glance</h2>
+<pre><code class="language-mermaid">flowchart LR
+  User[&quot;User / Validation Launcher&quot;] --&gt; S3In[&quot;S3 SpecInput / ValidationInput&quot;]
+  S3In --&gt; EventBridge[&quot;EventBridge Rule&quot;]
+  EventBridge --&gt; AuditSM[&quot;Audit Step Functions&quot;]
+  EventBridge --&gt; ValidationSM[&quot;Validation Step Functions&quot;]
+
+  AuditSM --&gt; Validate[&quot;Validate Spec&quot;]
+  Validate --&gt; Ingest[&quot;Ingest Spec&quot;]
+  Ingest --&gt; WorkItems[&quot;Build Law Work Items&quot;]
+  WorkItems --&gt; LawMap[&quot;Map: Each Target Law&quot;]
+  LawMap --&gt; Issues[&quot;Identify Issues&quot;]
+  Issues --&gt; Statute[&quot;Retrieve Statute Evidence&quot;]
+  Statute --&gt; Verdict[&quot;Determine Verdict / Routing&quot;]
+  Verdict --&gt; CaseChoice{&quot;Routing == LEGAL?&quot;}
+  CaseChoice --&gt;|yes and case-law enabled| CaseLaw[&quot;Retrieve Case Law&quot;]
+  CaseChoice --&gt;|no or disabled| Finalize[&quot;Finalize Law Result&quot;]
+  CaseLaw --&gt; Finalize
+  Finalize --&gt; Aggregate[&quot;Aggregate Audit Results&quot;]
+  Aggregate --&gt; ValidateOut[&quot;Validate Audit Output&quot;]
+  ValidateOut --&gt; ApprovalSM[&quot;Approval Step Functions&quot;]
+  ValidateOut --&gt; Output[&quot;S3 Evidence Artifacts&quot;]
+
+  ApprovalSM --&gt; Eng[&quot;Engineering Approval&quot;]
+  Eng --&gt; LegalChoice{&quot;Legal Review Required?&quot;}
+  LegalChoice --&gt;|yes| Legal[&quot;Legal Approval&quot;]
+  LegalChoice --&gt;|no| Business[&quot;Business Approval&quot;]
+  Legal --&gt; Business
+  Business --&gt; Notify[&quot;Stakeholder Notification&quot;]
+
+  Statute --&gt; StatuteKB[&quot;Bedrock Statute KB / AOSS&quot;]
+  CaseLaw --&gt; CaseKB[&quot;Bedrock Case Law KB / AOSS&quot;]
+  Issues --&gt; Bedrock[&quot;Bedrock Runtime / Prompt Cache&quot;]
+  Verdict --&gt; Bedrock
+  Output --&gt; DDB[&quot;DynamoDB Run / Approval Tables&quot;]
+  ApprovalSM --&gt; SNS[&quot;SNS Email Topics&quot;]
+</code></pre>
+<h2>Service Responsibilities</h2>
+<table><thead><tr><th>Service</th><th>Current PoC evidence</th><th>Why it was chosen</th></tr></thead><tbody>
+<tr><td>Amazon S3</td><td>Spec input, validation input, knowledge seed assets, audit output, and prompt cache buckets are declared in <code>infra/stacks/core_stack.py</code> and <code>infra/stacks/prompt_cache_stack.py</code>.</td><td>S3 gives durable, auditable object boundaries for input, evidence, manifests, and validation artifacts.</td></tr>
+<tr><td>Amazon EventBridge</td><td>Object-created rules start production audit and validation workflows from S3 prefixes.</td><td>EventBridge decouples ingestion from orchestration and makes event payloads explicit.</td></tr>
+<tr><td>AWS Step Functions</td><td>Separate audit, validation, and approval state machines are defined in the core stack.</td><td>State machines make long-running review workflows visible, retryable, and explainable to customers.</td></tr>
+<tr><td>AWS Lambda</td><td>Stage-isolated handlers run validation, ingestion, law work item construction, retrieval, verdict, finalization, aggregation, approval, and notification steps.</td><td>Lambda keeps each stage small and maps well to Step Functions task boundaries.</td></tr>
+<tr><td>Amazon Bedrock Knowledge Bases</td><td>Optional statute and case-law KB resources are defined with OpenSearch Serverless backing.</td><td>Bedrock Knowledge Bases provide managed retrieval for statute-grounded RAG while keeping the vector store visible in AWS architecture.</td></tr>
+<tr><td>OpenSearch Serverless</td><td>The KB stack defines separate statute and case-law vector indexes.</td><td>AOSS supports scalable vector retrieval without operating search clusters directly.</td></tr>
+<tr><td>Amazon Bedrock Runtime</td><td>Runtime code uses Bedrock Converse-style model calls for selected LLM-assisted stages where configured.</td><td>Bedrock gives managed FM access with an AWS-native control plane.</td></tr>
+<tr><td>Amazon DynamoDB</td><td>Audit run, approval task, and idempotency tables track state.</td><td>DynamoDB gives low-latency workflow state and conditional-write patterns for duplicate handling.</td></tr>
+<tr><td>Amazon SNS</td><td>Engineering, Legal, Business, and stakeholder topics support approval and notification paths.</td><td>SNS is simple, auditable, and appropriate for a PoC email-based approval path.</td></tr>
+<tr><td>Amazon API Gateway</td><td>HTTP routes support the approval review and decision callback flow.</td><td>API Gateway gives a controlled callback entry point without embedding decision handling in email itself.</td></tr>
+<tr><td>AWS Secrets Manager</td><td>A managed signing secret is created for approval review and decision payload verification.</td><td>Managed secrets keep signing material out of code and artifacts.</td></tr>
+<tr><td>AWS KMS</td><td>Source-of-truth buckets, prompt cache, SNS topics, SQS capture queues, and DynamoDB tables use customer-managed encryption where implemented.</td><td>KMS makes encryption posture explicit and reviewable.</td></tr>
+<tr><td>Amazon CloudWatch and AWS CloudTrail</td><td>The core stack defines dashboards, alarms, log queries, X-Ray tracing, and an optional project trail.</td><td>Observability is part of the review architecture, not an afterthought.</td></tr>
+</tbody></table>
+<h2>Main Runtime Flow</h2>
+<ol>
+<li>A spec or validation JSONL is uploaded to an S3 ingress prefix.</li>
+<li>EventBridge starts the audit or validation Step Functions workflow.</li>
+<li>The audit state machine validates the object, ingests the request, and builds law-scoped work items.</li>
+<li>Each target law runs issue extraction, statute retrieval, verdict/routing derivation, optional case-law support, and final law result assembly.</li>
+<li>The aggregate result is validated and, for production-style runs, sent to the approval state machine.</li>
+<li>Engineering approval is required, Legal / Compliance approval is conditional, and Business approval is required before stakeholder notification.</li>
+</ol>
+<h2>Validation Runtime</h2>
+<p>The validation state machine provisions or reuses validation KB resources, prepares an execution plan, processes JSONL rows through a distributed Map state, summarizes results, and cleans up or retains KB resources according to defined validation conditions. The default validation posture is cache-first, law-scoped, statute-first, and case-law disabled unless explicitly enabled.</p>
+<h2>Approval Flow</h2>
+<p>The approval path creates approval tasks, stores workflow state in DynamoDB, writes redacted evidence artifacts to S3, sends SNS notifications, and uses API Gateway plus Lambda to render and process human review decisions. The implementation includes signed review context, replay-resistant guard data, expiry handling, and explicit separation between opening a review page and confirming a decision.</p>
+<h2>Why This Architecture Is Appropriate For Cloud Architecture Review</h2>
+<p>The design translates an ambiguous compliance-review problem into an AWS-native architecture with explicit control points: input provenance, retrieval provenance, model invocation boundaries, deterministic adjudication, approval workflow state, evaluation gates, and security posture. It is a credible customer-facing blueprint because it names what is implemented and what remains backlog before production.</p>
+<h2>Trade-Offs</h2>
+<table><thead><tr><th>Decision</th><th>Benefit</th><th>Trade-off</th></tr></thead><tbody>
+<tr><td>Step Functions over a monolithic service</td><td>Clear stage ownership and auditability</td><td>More state-machine design and payload discipline required</td></tr>
+<tr><td>Public-safe evidence boundaries</td><td>Reproducibility and evidence handoff</td><td>Object naming and public artifact policy must be governed</td></tr>
+<tr><td>Separate statute and case-law lanes</td><td>Better provenance and legal-review clarity</td><td>More retrieval configuration to manage</td></tr>
+<tr><td>Lambda stage isolation</td><td>Smaller blast radius per step</td><td>Cold starts and cross-step schema discipline matter</td></tr>
+<tr><td>Manual approval path</td><td>Responsible AI boundary remains visible</td><td>Production identity, auth, WAF, and rate limiting remain backlog</td></tr>
+</tbody></table>
+<h2>Production Backlog</h2>
+<table><thead><tr><th>Area</th><th>Backlog</th></tr></thead><tbody>
+<tr><td>Identity and access</td><td>Split deployment, runtime, validation, and operator roles; add permission boundaries and IAM Access Analyzer review.</td></tr>
+<tr><td>Network security</td><td>Add private access where appropriate, VPC endpoints, WAF, authenticated approval endpoints, and rate limiting.</td></tr>
+<tr><td>Release operations</td><td>Promote validated release records through CI/CD, model/prompt/KB registries, and environment-specific aliases.</td></tr>
+<tr><td>Observability</td><td>Add SLOs, drift alerts, cost alerts, quality dashboards, and incident runbooks.</td></tr>
+<tr><td>Data governance</td><td>Add sensitive-data discovery where appropriate and stricter environment separation.</td></tr>
+<tr><td>Scalability</td><td>Add tenant boundaries, quotas, backpressure, and per-customer KB lifecycle strategy.</td></tr>
+</tbody></table>
+<h2>What Not To Overclaim</h2>
+<p>This is not autonomous legal advice. It is not guaranteed legal correctness. It is a security-aware architecture demonstration, not production-ready without further hardening. The PoC demonstrates an evaluation-governed AWS GenAI architecture, not a production legal decision engine.</p>
+  </main>
+</body>
+</html>

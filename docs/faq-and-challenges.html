@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ And Challenges | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="faq-and-challenges.md">Markdown source</a>
+    </nav>
+<h1>FAQ And Challenges</h1>
+<h2>Common Technical Questions</h2>
+<table><thead><tr><th>Challenge</th><th>Answer</th></tr></thead><tbody>
+<tr><td>Is this really production-ready?</td><td>No. It is a security-aware PoC and architecture demonstration. Production readiness would require hardened IAM, identity, network controls, monitoring, CI/CD promotion, and operational runbooks.</td></tr>
+<tr><td>Is this legal advice?</td><td>No. It is first-pass compliance triage. It helps spot issues, ground evidence, route decisions, and prepare recommendations. Final judgment remains Human-in-the-Loop.</td></tr>
+<tr><td>Why statute-first RAG?</td><td>Statutes and regulations are the primary authority for this workflow. Using statute-first retrieval improves provenance and makes the system easier to explain to legal and compliance stakeholders.</td></tr>
+<tr><td>Why separate case law?</td><td>Case law can help Legal review, but it should not blur into the primary statute lane. Separation keeps provenance clear and prevents the model from over-weighting secondary evidence.</td></tr>
+<tr><td>Why deterministic adjudication?</td><td>Deterministic adjudication makes final outcome and routing testable. The LLM can assist, but the system should not rely on a free-form answer for workflow decisions.</td></tr>
+<tr><td>Why not just ask the LLM?</td><td>A single prompt cannot provide durable governance, provenance, release gates, approval workflow, or repeatable evaluation. Enterprise GenAI needs explicit control points.</td></tr>
+<tr><td>How do you handle weak evidence?</td><td>The guardrail downgrades a would-be clearance to review-needed behavior when evidence quality is weak or mixed. That prevents overconfident clearance.</td></tr>
+<tr><td>How do you prevent prompt leakage?</td><td>Public packages exclude prompt bodies, model messages, cache entries, and full transcripts. Release evidence uses metrics, hashes, summaries, manifests, and redacted references.</td></tr>
+<tr><td>How do you evaluate RAG?</td><td>Separate outcome match, review-route match, grounding F1@20, retrieval provenance, basis sufficiency, and stage-level artifacts. Use replay and validation before final confirmation.</td></tr>
+<tr><td>What does the baseline prove?</td><td>It establishes a concrete KPI under defined validation conditions and scorer. It proves the PoC has measurable release criteria.</td></tr>
+<tr><td>What does it not prove?</td><td>It does not prove guaranteed legal correctness, live AWS health, production security, or autonomous approval safety.</td></tr>
+<tr><td>How could this pattern extend to Amazon Q Business?</td><td>Amazon Q Business could serve as the enterprise assistant/workflow interface on top of governed knowledge, identity, approval, and evaluation patterns. The current repository does not implement Amazon Q.</td></tr>
+<tr><td>How could this integrate with SAML, Okta, Azure AD, or IAM Identity Center?</td><td>Enterprise identity can connect reviewer roles, access policies, and approval authorization, then map group claims to Engineering, Legal, Business, and administrator permissions.</td></tr>
+<tr><td>How could cost be reduced?</td><td>Use cache-first validation, exact prompt cache, retained KB reuse, lifecycle policies, cost dashboards, model selection by task complexity, and targeted validation before broad runs.</td></tr>
+<tr><td>How could security be improved?</td><td>Split IAM roles, add WAF/auth/rate limiting, private access, VPC endpoints, KMS policy review, sensitive-data discovery, drift alerts, and approval endpoint identity binding.</td></tr>
+<tr><td>How could this scale to other laws?</td><td>Add law-specific checklist assets, statute chunks, routing policies, evaluation truth, and failure taxonomy. Do not simply reuse prompts without law-specific evaluation.</td></tr>
+<tr><td>How could this be explained to a C-suite customer?</td><td>&quot;AI prepares a grounded first pass for review, reducing manual triage time, while human experts retain final judgment. We measure quality before rollout and harden security before production.&quot;</td></tr>
+</tbody></table>
+  </main>
+</body>
+</html>

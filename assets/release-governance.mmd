@@ -1,0 +1,12 @@
+flowchart LR
+  Release["Release scorecard or summary metrics"] --> Gate["Metrics-only release gate"]
+  Gate --> Report["Machine-readable gate report"]
+  Report --> Manifest["Approved release manifest"]
+  Manifest --> Approval["Human-in-the-Loop evidence references"]
+  Manifest --> Rollback["Rollback reference"]
+  Manifest --> Package["Public-facing evidence package"]
+
+  Baseline["Held-out baseline metrics config"] --> Gate
+  Policy["Release gate policy"] --> Gate
+  Safety["Public-safe evidence boundary"] --> Gate
+  Safety --> Manifest

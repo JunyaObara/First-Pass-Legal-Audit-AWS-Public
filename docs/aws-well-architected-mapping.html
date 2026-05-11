@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Well-Architected Mapping | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="aws-well-architected-mapping.md">Markdown source</a>
+    </nav>
+<h1>AWS Well-Architected Mapping</h1>
+<h2>Mapping Summary</h2>
+<p>This mapping is written for technical review. It identifies current PoC evidence, why each pillar matters, and what must be hardened before production.</p>
+<table><thead><tr><th>Pillar</th><th>Current PoC implementation evidence</th><th>Why it matters</th><th>Additional hardening before production use</th><th>Technical review point</th></tr></thead><tbody>
+<tr><td>Operational Excellence</td><td>Step Functions workflows, CloudWatch dashboard, alarms, log queries, runbooks, validation playbook, and CI smoke checks.</td><td>GenAI systems need observable workflows, repeatable validation, and clear ownership.</td><td>Add SLOs, incident runbooks, on-call dashboards, drift detection, and automated release promotion.</td><td>The workflow is made inspectable before scale-out concerns are introduced.</td></tr>
+<tr><td>Security</td><td>SSE-KMS source buckets, KMS-backed prompt cache, DynamoDB encryption, Secrets Manager signing secret, public-safe evidence boundaries, and warning-only posture checker.</td><td>Compliance artifacts and approval state must be protected even in a PoC.</td><td>Least-privilege IAM split, WAF/auth/rate limiting, private access, VPC endpoints, Macie where appropriate, and key policy review.</td><td>&quot;Security posture is part of AI governance, not a separate appendix.&quot;</td></tr>
+<tr><td>Reliability</td><td>Standard Step Functions, retries/catches, DynamoDB idempotency table, approval expiry handling, validation cleanup paths, and retained KB reuse policy.</td><td>Long-running AI workflows fail in many places; failure must be attributable.</td><td>Add DLQs where appropriate, chaos tests, alias-based deployment, retry budgets, and recovery runbooks.</td><td>&quot;The architecture separates failure handling by workflow stage.&quot;</td></tr>
+<tr><td>Performance Efficiency</td><td>Lambda stage isolation, distributed validation Map state, S3 artifact indirection, retrieval top-k controls, exact prompt cache, and optional reranking controls.</td><td>AI workflows must manage latency, throughput, and model calls explicitly.</td><td>Add load tests, concurrency quotas, queue-based backpressure, and per-stage latency budgets.</td><td>&quot;The design controls model and retrieval cost rather than treating them as a black box.&quot;</td></tr>
+<tr><td>Cost Optimization</td><td>Cache-first validation policy, exact prompt cache, low-KMS scratch lane, retained KB reuse, and cost guardrails.</td><td>Evaluation loops can become expensive without guardrails.</td><td>Add cost allocation tags, cost anomaly alerts, per-customer budgets, and automated cost reports.</td><td>The validation loop is optimized without weakening the intended production encryption posture.</td></tr>
+<tr><td>Sustainability</td><td>Serverless orchestration, managed retrieval resources, cache reuse, retained KB reuse, and no unnecessary live runs in normal validation.</td><td>Efficient resource use supports both cost and sustainability.</td><td>Add lifecycle policies, scheduled cleanup, right-sized validation capacity, and usage dashboards.</td><td>&quot;Reuse and cache discipline reduce unnecessary compute and rebuilds.&quot;</td></tr>
+</tbody></table>
+<h2>Boundaries</h2>
+<p>This mapping does not claim a completed production Well-Architected review. It shows that the PoC was designed with Well-Architected concerns visible and that production work is intentionally named.</p>
+  </main>
+</body>
+</html>

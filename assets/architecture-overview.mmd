@@ -1,0 +1,35 @@
+flowchart LR
+  User["User / Validation Launcher"] --> S3In["S3 SpecInput / ValidationInput"]
+  S3In --> EventBridge["EventBridge Rule"]
+  EventBridge --> AuditSM["Audit Step Functions"]
+  EventBridge --> ValidationSM["Validation Step Functions"]
+
+  AuditSM --> Validate["Validate Spec"]
+  Validate --> Ingest["Ingest Spec"]
+  Ingest --> WorkItems["Build Law Work Items"]
+  WorkItems --> LawMap["Map: Each Target Law"]
+  LawMap --> Issues["Identify Issues"]
+  Issues --> Statute["Retrieve Statute Evidence"]
+  Statute --> Verdict["Determine Verdict / Routing"]
+  Verdict --> CaseChoice{"Routing == LEGAL?"}
+  CaseChoice -->|yes and case-law enabled| CaseLaw["Retrieve Case Law"]
+  CaseChoice -->|no or disabled| Finalize["Finalize Law Result"]
+  CaseLaw --> Finalize
+  Finalize --> Aggregate["Aggregate Audit Results"]
+  Aggregate --> ValidateOut["Validate Audit Output"]
+  ValidateOut --> ApprovalSM["Approval Step Functions"]
+  ValidateOut --> Output["S3 Evidence Artifacts"]
+
+  ApprovalSM --> Eng["Engineering Approval"]
+  Eng --> LegalChoice{"Legal Review Required?"}
+  LegalChoice -->|yes| Legal["Legal Approval"]
+  LegalChoice -->|no| Business["Business Approval"]
+  Legal --> Business
+  Business --> Notify["Stakeholder Notification"]
+
+  Statute --> StatuteKB["Bedrock Statute KB / AOSS"]
+  CaseLaw --> CaseKB["Bedrock Case Law KB / AOSS"]
+  Issues --> Bedrock["Bedrock Runtime / Prompt Cache"]
+  Verdict --> Bedrock
+  Output --> DDB["DynamoDB Run / Approval Tables"]
+  ApprovalSM --> SNS["SNS Email Topics"]

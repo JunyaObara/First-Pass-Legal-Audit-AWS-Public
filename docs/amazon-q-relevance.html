@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Amazon Q Business / Enterprise GenAI Relevance | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="amazon-q-relevance.md">Markdown source</a>
+    </nav>
+<h1>Amazon Q Business / Enterprise GenAI Relevance</h1>
+<h2>Important Boundary</h2>
+<p>This repository does not implement Amazon Q. It demonstrates a governed enterprise GenAI workflow pattern that can be extended to Amazon Q Business-style workflows: knowledge grounding, enterprise identity, workflow integration, evaluation gates, approval routing, and ROI-focused rollout.</p>
+<p>The relevance to Amazon Q / enterprise GenAI roles is not that this PoC implements Amazon Q, but that it demonstrates how to identify a high-value enterprise workflow, connect it to governed knowledge, integrate human approval, define evaluation gates, and plan adoption beyond the initial prototype.</p>
+<h2>Relevance To Enterprise GenAI Adoption</h2>
+<table><thead><tr><th>Capability area</th><th>How this PoC maps</th></tr></thead><tbody>
+<tr><td>Cloud-native GenAI architecture</td><td>Demonstrates translating an ambiguous legal/compliance problem into a secure, event-driven AWS GenAI architecture with Bedrock, Step Functions, Lambda, S3, DynamoDB, SNS, KMS, and governance controls.</td></tr>
+<tr><td>Enterprise GenAI adoption strategy</td><td>Shows how to frame enterprise GenAI adoption: discover use cases, align stakeholders, design workshops, quantify ROI, manage risk, and move from PoC to governed rollout.</td></tr>
+<tr><td>Governed GenAI delivery and integration</td><td>Shows hands-on delivery patterns: reusable workflow blueprint, stage isolation, retrieval governance, evaluation gates, traceable release records, and secure integration points.</td></tr>
+</tbody></table>
+<h2>Enterprise GenAI Adoption Roadmap</h2>
+<ol>
+<li>Identify high-value review workflows where domain experts are overloaded but final judgment must remain human.</li>
+<li>Map knowledge sources, approval owners, business risk, and measurable outcomes.</li>
+<li>Build a narrow PoC with retrieval provenance, model boundaries, and explicit safety controls.</li>
+<li>Validate with replay, targeted slices, random slices, full validation, and protected final confirmation.</li>
+<li>Integrate identity, workflow tools, observability, and release governance before production rollout.</li>
+<li>Scale the pattern across departments while preserving per-domain evaluation and ownership.</li>
+</ol>
+<h2>Workshop Pattern</h2>
+<table><thead><tr><th>Workshop module</th><th>Customer outcome</th></tr></thead><tbody>
+<tr><td>Problem framing</td><td>A prioritized workflow opportunity with risk and ROI hypotheses.</td></tr>
+<tr><td>Knowledge mapping</td><td>Source-of-truth systems, evidence lanes, freshness rules, and content owners.</td></tr>
+<tr><td>Workflow design</td><td>Human approval points, escalation paths, and system-of-record integration.</td></tr>
+<tr><td>GenAI architecture</td><td>Bedrock or Amazon Q Business-style pattern selection, retrieval design, data boundaries, and security controls.</td></tr>
+<tr><td>Evaluation design</td><td>Baseline metrics, release gates, failure taxonomy, and protected test data policy.</td></tr>
+<tr><td>Production backlog</td><td>IAM, identity, monitoring, cost, drift, incident response, and rollout phases.</td></tr>
+</tbody></table>
+<h2>Amazon Q Business Extension Points</h2>
+<table><thead><tr><th>Extension point</th><th>How it would apply</th></tr></thead><tbody>
+<tr><td>Enterprise identity</td><td>Connect to SAML, Okta, Azure AD, IAM Identity Center, or another enterprise identity source for role-aware access and approvals.</td></tr>
+<tr><td>Application integration</td><td>Surface review workflow actions inside enterprise apps, ticketing systems, document systems, or chat-based assistant experiences.</td></tr>
+<tr><td>Knowledge governance</td><td>Use curated knowledge sources and clear ownership rules so retrieval reflects approved enterprise content.</td></tr>
+<tr><td>Approval state</td><td>Use DynamoDB or a workflow system to track approval tasks, decisions, and audit trail.</td></tr>
+<tr><td>Reusable blueprint</td><td>Reuse the pattern for security review, procurement review, privacy review, policy review, and engineering readiness review.</td></tr>
+</tbody></table>
+<h2>ROI Framing</h2>
+<p>The value proposition is not &quot;AI replaces experts.&quot; The value proposition is &quot;AI prepares a grounded first pass so experts spend more time on judgment and less time on repeated triage.&quot; Example ROI metrics include review cycle time, escalation precision, rework reduction, evidence-pack completeness, and reviewer throughput.</p>
+<h2>Customer-Safe Statement</h2>
+<p>This PoC is not an Amazon Q implementation. It is a governed enterprise GenAI workflow pattern that could be extended to Amazon Q Business-style workflows where the customer wants an assistant experience connected to enterprise knowledge, identity, workflow actions, and measurable adoption outcomes.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Implementation Review Guide | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public implementation review guide summarizing source implementation structure and architecture responsibilities for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="code-walkthrough-for-reviewers.md">Markdown source</a>
+    </nav>
+<h1>Implementation Review Guide</h1>
+<h2>Public Repository Boundary</h2>
+<p>This public portfolio does not include the full application source code. It is a presentation layer with architecture diagrams, public-safe summaries, evaluation context, and governance documentation.</p>
+<p>The implementation areas below summarize the source implementation structure. They are included to explain the engineering scope behind the public portfolio, not to imply that the full source code is published here.</p>
+<h2>Recommended Review Path</h2>
+<p>Start with the public narrative, then use this guide as an implementation architecture summary. The goal is to connect architecture judgment to concrete source areas without implying that the public repository contains the full source code.</p>
+<table><thead><tr><th>Source implementation area</th><th>Implementation responsibility summarized</th><th>Capability demonstrated</th><th>What not to overclaim</th></tr></thead><tbody>
+<tr><td><code>README.md</code></td><td>System purpose, architecture, contracts, run modes, and guardrails.</td><td>Source-of-truth documentation discipline.</td><td>Do not treat documentation as live deployment proof.</td></tr>
+<tr><td>Source repository overview materials</td><td>Short project narrative and evidence package framing.</td><td>Ability to explain the architecture to technical reviewers.</td><td>Do not claim every evidence item is published in this public repository.</td></tr>
+<tr><td><code>app_reviewdemo_v94.py</code></td><td>CDK entry point, deploy profiles, default email, retained KB manifest, model settings, and source hash context.</td><td>Cloud-native deployment composition.</td><td>Do not claim the script deploys during a public portfolio review.</td></tr>
+<tr><td><code>infra/config.py</code></td><td>PlatformContext, deployment defaults, Bedrock, KB, cache, approval, and validation controls.</td><td>Typed infrastructure configuration discipline.</td><td>Do not claim all context values are production final.</td></tr>
+<tr><td><code>infra/stacks/core_stack.py</code></td><td>S3, EventBridge, Step Functions, Lambda, DynamoDB, SNS, API Gateway, KMS, CloudWatch, and optional CloudTrail.</td><td>AWS event-driven GenAI workflow design.</td><td>Do not claim least-privilege is complete.</td></tr>
+<tr><td><code>infra/stacks/kb_optional_stack.py</code></td><td>Bedrock KB, AOSS, separate statute/case-law resources, embedding model, and development standby posture.</td><td>Managed RAG infrastructure.</td><td>Do not claim case-law is always enabled.</td></tr>
+<tr><td><code>infra/stacks/prompt_cache_stack.py</code></td><td>KMS-backed versioned prompt cache bucket.</td><td>Application-level exact cache foundation.</td><td>Do not claim semantic cache.</td></tr>
+<tr><td><code>runtime/privacy_audit/models.py</code></td><td>Structured dataclasses for hits, issues, recommendations, law results, and audit envelope.</td><td>Explicit data contracts.</td><td>Do not claim schema completeness for every production integration.</td></tr>
+<tr><td><code>runtime/privacy_audit/use_cases/</code></td><td>Stage-specific workflow logic for audit, validation, approval, retrieval, and finalization.</td><td>Lambda-stage separation and workflow ownership.</td><td>Do not claim all modules are small; some finalization logic is intentionally complex.</td></tr>
+<tr><td><code>runtime/privacy_audit/bedrock/kb.py</code></td><td>Retrieval config, law filters, reranking controls, multi-query fusion, and local fallback.</td><td>Bedrock KB retrieval and reproducible retrieval paths.</td><td>Do not claim every run uses live KB retrieval.</td></tr>
+<tr><td><code>runtime/privacy_audit/bedrock/llm.py</code></td><td>Bedrock Runtime wrapper, exact cache, token estimates, cost guardrails, and structured output parsing.</td><td>Cost-aware LLM invocation and observability.</td><td>Do not expose prompt bodies or transcripts.</td></tr>
+<tr><td><code>runtime/privacy_audit/analysis/</code></td><td>Query planning, recommendation logic, verdict/routing helpers, evidence classes, and adjudication modules.</td><td>Model-assisted plus deterministic AI workflow design.</td><td>Do not claim the LLM alone decides legal outcomes.</td></tr>
+<tr><td><code>runtime/data/checklists*/</code></td><td>Law-specific checklist contracts and item order.</td><td>Policy/config-driven issue spotting.</td><td>Do not claim exhaustive legal coverage.</td></tr>
+<tr><td><code>runtime/data/routing/</code></td><td>Recommendation-to-route and owner maps.</td><td>Transparent escalation behavior.</td><td>Do not invent public outcome labels.</td></tr>
+<tr><td><code>runtime/data/routing_policy/</code></td><td>Evidence classes and deterministic routing policies.</td><td>Law-specific routing governance.</td><td>Do not claim policy is legally final.</td></tr>
+<tr><td><code>configs/evaluation/</code></td><td>Baseline metrics and release gate policy.</td><td>LLMOps quality gate.</td><td>Do not use held-out row content for tuning.</td></tr>
+<tr><td><code>configs/release/</code></td><td>Approved manifest example and schema.</td><td>Release lineage and rollback reference.</td><td>Do not claim automated AWS rollback.</td></tr>
+<tr><td><code>scripts/evaluate_release_gate.py</code></td><td>Metrics-only release gate implementation.</td><td>Protected release decision artifact.</td><td>Do not claim it runs live validation.</td></tr>
+<tr><td><code>scripts/validate_approved_manifest.py</code></td><td>Manifest safety and lineage validation.</td><td>Release governance checks.</td><td>Do not include sensitive active links or secret-like values.</td></tr>
+<tr><td><code>scripts/check_security_posture.py</code></td><td>Warning-only posture scanner.</td><td>Security debt visibility.</td><td>Do not call it a production scanner.</td></tr>
+<tr><td><code>.github/workflows/</code></td><td>CI contract, release gate, manifest, and security posture smoke checks.</td><td>Local/CI governance without AWS calls.</td><td>Do not claim fixture CI proves live AWS health.</td></tr>
+<tr><td><code>tests/</code></td><td>Contract, release gate, manifest, security, Bedrock cache, retrieval, approval, and validation tests.</td><td>Regression discipline.</td><td>Do not claim every production path is fully tested.</td></tr>
+</tbody></table>
+<h2>Suggested Technical Review Sequence</h2>
+<ol>
+<li>Start from the public architecture overview and supporting docs.</li>
+<li>The core stack resource declarations show how the AWS workflow is composed.</li>
+<li>The audit state machine maps into runtime use cases.</li>
+<li>RAG behavior is concentrated in <code>bedrock/kb.py</code>, <code>bedrock/llm.py</code>, and <code>analysis/</code>.</li>
+<li>Evaluation configs and release scripts show how quality gates are modeled.</li>
+<li>Security posture docs, posture checks, and the production hardening backlog show the current boundary.</li>
+</ol>
+<h2>What This Page Is Not</h2>
+<p>This page is not a claim that the public repository contains the full source implementation. It summarizes implementation structure and architecture decisions that can be discussed when appropriate access to source artifacts is available.</p>
+  </main>
+</body>
+</html>

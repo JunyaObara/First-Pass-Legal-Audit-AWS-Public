@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio Discussion Guide | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public discussion guide for reviewing the CloudNative GenAI Compliance Review on AWS portfolio without live AWS access or private source disclosure.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="demo-script.md">Markdown source</a>
+    </nav>
+<h1>Portfolio Discussion Guide</h1>
+<h2>Purpose</h2>
+<p>This page provides a public guide for reviewing the portfolio. It summarizes the discussion topics, review boundaries, and technical areas that help readers understand the architecture without requiring live AWS access or private source code.</p>
+<p>The portfolio can be discussed without live AWS access. The public site focuses on architecture diagrams, design rationale, evaluation summaries, Responsible AI boundaries, and production hardening considerations.</p>
+<h2>Suggested 8-Minute Discussion Flow</h2>
+<table><thead><tr><th>Time</th><th>Topic</th><th>Discussion focus</th></tr></thead><tbody>
+<tr><td>0:00-0:45</td><td>Positioning</td><td>The project is a first-pass compliance triage PoC, not autonomous legal advice. The architecture demonstrates governed GenAI on AWS.</td></tr>
+<tr><td>0:45-1:45</td><td>Architecture</td><td>The public architecture diagram shows S3 ingestion, EventBridge, Step Functions, Lambda stages, Bedrock Knowledge Bases, Bedrock Runtime, DynamoDB/S3 state, SNS/API Gateway approval integration, KMS, CloudWatch, and optional CloudTrail.</td></tr>
+<tr><td>1:45-3:00</td><td>AI/RAG pipeline</td><td>The RAG design uses statute-first retrieval, checklist extraction, query planning, basis selection, deterministic adjudication, recommendation generation, and citation projection.</td></tr>
+<tr><td>3:00-4:15</td><td>Human-in-the-Loop governance</td><td>Engineering review is required, Legal review is conditional, Business approval is required, and stakeholder notification is modeled.</td></tr>
+<tr><td>4:15-5:30</td><td>Evaluation and LLMOps</td><td>The PoC uses held-out baseline metrics, validation stages, release gates, and traceable release records to avoid relying on demo-only impressions.</td></tr>
+<tr><td>5:30-6:45</td><td>Security and production boundaries</td><td>The public discussion should cover encryption posture, managed signing posture, approval-state protection, observability, and the production hardening backlog without claiming production readiness.</td></tr>
+<tr><td>6:45-8:00</td><td>Enterprise GenAI extension</td><td>The same governed workflow pattern can be extended to Amazon Q Business-style enterprise workflows, while the current PoC does not implement Amazon Q.</td></tr>
+</tbody></table>
+<h2>Deeper Technical Discussion Topics</h2>
+<p>For a deeper technical review, the most useful topics are:</p>
+<ol>
+<li>The customer problem and why global software compliance review benefits from earlier, evidence-grounded triage.</li>
+<li>The AWS service selection and why event-driven orchestration, managed retrieval, serverless stages, stateful approvals, and observability fit the workflow.</li>
+<li>The AI/RAG design, including statute-first grounding, law-scoped retrieval, evidence sufficiency, and deterministic routing.</li>
+<li>The evaluation approach, including the held-out baseline, validation ladder, metrics-only release gate, and manifest-style release records.</li>
+<li>The security and Responsible AI boundary, including what the public portfolio does and does not claim.</li>
+<li>The productionization roadmap: identity, access control, private access, endpoint hardening, monitoring, cost controls, runbooks, and per-domain evaluation ownership.</li>
+</ol>
+<h2>Implementation Areas Behind The Public Portfolio</h2>
+<p>The public repository does not contain the full application source. The following areas summarize the implementation scope behind the portfolio and explain what each area contributes to the architecture:</p>
+<ol>
+<li><code>app_reviewdemo_v94.py</code> for CDK entry point, deploy profiles, retained KB manifest, model settings, and source context.</li>
+<li><code>infra/stacks/core_stack.py</code> for S3, EventBridge, Step Functions, Lambda, DynamoDB, SNS, API Gateway, KMS, CloudWatch, and optional CloudTrail.</li>
+<li><code>runtime/privacy_audit/use_cases/</code> for stage-specific workflow boundaries.</li>
+<li><code>runtime/privacy_audit/bedrock/kb.py</code> and <code>runtime/privacy_audit/bedrock/llm.py</code> for retrieval, Bedrock integration, caching, and cost-aware model invocation.</li>
+<li><code>runtime/privacy_audit/analysis/</code> and routing configuration for deterministic adjudication, evidence classes, and weak-evidence guardrails.</li>
+<li><code>configs/evaluation/</code>, <code>configs/release/</code>, and release scripts for evaluation governance.</li>
+<li>CI workflows and tests for contract, release gate, manifest, security posture, retrieval, approval, and validation checks.</li>
+</ol>
+<h2>No-Live-AWS Discussion Path</h2>
+<p>If live AWS access is unavailable or inappropriate, the portfolio can still be reviewed using public artifacts:</p>
+<ol>
+<li>Start from the landing page and architecture diagram.</li>
+<li>Review the Architecture Deep Dive and AI/RAG Design pages.</li>
+<li>Review the Evaluation & LLMOps page for metric interpretation and release governance.</li>
+<li>Review the Security & Responsible AI page for the PoC boundary and production hardening backlog.</li>
+<li>Use the Implementation Review Guide to understand which source areas sit behind the public architecture summary.</li>
+<li>State clearly that no live AWS deployment, live Bedrock inference, or production health check is being demonstrated in this public review.</li>
+</ol>
+<h2>Public Review Boundaries</h2>
+<p>The public portfolio intentionally focuses on diagrams, architecture rationale, evaluation summaries, and governance boundaries. It does not publish raw prompts, prompt cache payloads, private runtime data, final evaluation rows, active approval links, credentials, signed query parameters, or unpublished customer data.</p>
+<p>The correct claim is that the PoC demonstrates a governed AWS GenAI workflow pattern for first-pass compliance triage. It does not claim autonomous legal advice, guaranteed legal correctness, production readiness, live AWS health, or that Amazon Q is part of the current implementation.</p>
+  </main>
+</body>
+</html>

@@ -1,0 +1,58 @@
+{
+  "ai_patterns": [
+    "statute-first RAG",
+    "law-scoped retrieval",
+    "deterministic adjudication",
+    "evidence sufficiency",
+    "exact prompt cache",
+    "conditional case-law support"
+  ],
+  "governance_patterns": [
+    "Human-in-the-Loop",
+    "metrics-only release gate",
+    "traceable release records",
+    "final evaluation data separation",
+    "public-safe evidence boundary"
+  ],
+  "customer_applicability": [
+    "globally delivered software",
+    "products, platforms, apps, APIs, AI features, analytics features, media flows, user-profile features, and cross-border data flows",
+    "regulated review workflows where first-pass evidence preparation can reduce late-stage review surprises"
+  ],
+  "intentionally_not_claimed": [
+    "Does not claim autonomous legal advice",
+    "Does not claim guaranteed legal correctness",
+    "Does not claim Amazon Q implementation",
+    "Does not claim automated AWS rollback",
+    "Does not claim full production readiness"
+  ],
+  "key_aws_services": [
+    "S3",
+    "EventBridge",
+    "Step Functions",
+    "Lambda",
+    "Bedrock Knowledge Bases",
+    "Bedrock Runtime",
+    "OpenSearch Serverless",
+    "DynamoDB",
+    "SNS",
+    "API Gateway",
+    "KMS",
+    "Secrets Manager",
+    "CloudWatch",
+    "CloudTrail"
+  ],
+  "project_title": "CloudNative GenAI Compliance Review on AWS",
+  "public_claims": [
+    "First-pass compliance triage PoC",
+    "Evaluation-governed AWS GenAI architecture",
+    "Security-aware PoC requiring additional enterprise production controls"
+  ],
+  "short_tagline": "Every spec gets a first-pass GenAI triage. Human experts approve high-risk decisions.",
+  "source_repository": "JunyaObara/First-Pass-Legal-Audit-AWS",
+  "portfolio_audience": [
+    "Cloud-native GenAI architecture",
+    "Enterprise GenAI adoption strategy",
+    "Governed GenAI delivery and integration"
+  ]
+}

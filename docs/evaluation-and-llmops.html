@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Evaluation And LLMOps | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="evaluation-and-llmops.md">Markdown source</a>
+    </nav>
+<h1>Evaluation And LLMOps</h1>
+<h2>Governance Position</h2>
+<p>The PoC treats evaluation as a release decision, not a slide at the end of a demo. Candidate changes are judged through scorecards, defined validation conditions, baseline metrics, release gates, and traceable release records.</p>
+<p>Final evaluation data is kept separate from day-to-day tuning. This keeps quality claims measurable without turning the final test set into an optimization target.</p>
+<h2>Reader-Friendly Terms</h2>
+<table><thead><tr><th>Term</th><th>Plain-English meaning</th></tr></thead><tbody>
+<tr><td>Defined validation conditions</td><td>The documented settings used for a measurement run, such as sample count, retrieval mode, and scorer.</td></tr>
+<tr><td>Final evaluation data</td><td>Data reserved for final confirmation rather than iterative tuning.</td></tr>
+<tr><td>Release gate</td><td>A rule-based check that decides whether measured metrics are strong enough for a release claim.</td></tr>
+<tr><td>Release record</td><td>A traceable record of what code, model/retrieval settings, metrics, and approval evidence were associated with a candidate release.</td></tr>
+</tbody></table>
+<h2>Validation Ladder</h2>
+<table><thead><tr><th>Level</th><th>When to use it</th><th>What it proves</th></tr></thead><tbody>
+<tr><td>Replay and artifact comparison</td><td>First check after a small change</td><td>Whether deterministic behavior or cached artifacts reproduce expected stage output.</td></tr>
+<tr><td>Targeted slice</td><td>When a known failure family is being investigated</td><td>Whether a focused fix addresses a specific cluster without broad cost.</td></tr>
+<tr><td>Random slice</td><td>When targeted results look promising</td><td>Whether the change generalizes beyond the target cluster.</td></tr>
+<tr><td>Full validation</td><td>Before release judgment</td><td>Whether broad validation metrics and artifacts remain healthy.</td></tr>
+<tr><td>Held-out confirmation</td><td>Final gate only</td><td>Whether the release option meets the protected KPI without tuning on row content.</td></tr>
+</tbody></table>
+<h2>Baseline Validation Conditions</h2>
+<p>The inspected <code>configs/evaluation/heldout_baseline_metrics.json</code> records:</p>
+<p>These are internal run-condition identifiers included for traceability. For non-specialist readers, the key point is that validation data, held-out confirmation, run settings, and scorer definitions are recorded separately so metrics can be compared honestly.</p>
+<table><thead><tr><th>Metric</th><th>Human-readable result</th><th>Machine-readable reference</th></tr></thead><tbody>
+<tr><td>Held-out sample count</td><td><code>42</code> samples</td><td><code>sample_count = 42</code></td></tr>
+<tr><td>Outcome match</td><td><code>80.95%</code> (<code>34/42</code>)</td><td><code>observed_law_authoritative_quality.target_law_outcome_accuracy = 0.8095238095238095</code></td></tr>
+<tr><td>Review-route match</td><td><code>78.57%</code> (<code>33/42</code>)</td><td><code>observed_law_authoritative_quality.target_law_routing_accuracy = 0.7857142857142857</code></td></tr>
+<tr><td>Grounding F1@20</td><td><code>82.58%</code></td><td><code>grounding_quality.target_law_grounding_f1_at_20 = 0.8258229728673079</code></td></tr>
+</tbody></table>
+<h2>Metrics-Only Release Gate</h2>
+<p><code>configs/evaluation/release_gate_policy.json</code> defines a metrics-only gate named <code>heldout_baseline_equivalence</code>. <code>scripts/evaluate_release_gate.py</code> reads scorecard, summary, or metrics JSON; checks required validation fields; compares release metrics to thresholds; blocks unsafe evidence references; and emits a machine-readable report.</p>
+<p>This design protects final evaluation data because the gate compares metrics and validation settings rather than row-level content.</p>
+<h2>Release Record Relationship</h2>
+<p>The approved manifest is the repository's release-record format. It captures source repository, runtime contract, retrieval contract, evaluation contract, gate report, approval evidence references, rollback reference, and data-safety flags. The validator is standard-library-only and enforces the safety-critical subset.</p>
+<p>The important distinction is simple: the release gate decides whether a scorecard passes, and the release record documents what was approved and what can be restored.</p>
+<h2>CI Checks</h2>
+<p>The inspected GitHub Actions workflow runs:</p>
+<table><thead><tr><th>Check</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Contract test slice</td><td>Validates law result, recommendations, validation KB lifecycle, official benchmark contract, and toolchain preflight.</td></tr>
+<tr><td>Release gate governance smoke</td><td>Runs the release gate on a passing fixture and validates the example manifest.</td></tr>
+<tr><td>Manifest tests</td><td>Checks schema alignment, forbidden sensitive fields, baseline enforcement, and safety flags.</td></tr>
+<tr><td>Security posture warning smoke</td><td>Runs the static posture checker and its tests without AWS calls.</td></tr>
+</tbody></table>
+<h2>What The Current Metrics Mean</h2>
+<p>The baseline metrics show a concrete recognition target under defined validation conditions and scorer. They support the claim that the PoC has a measurable quality gate and a protected final-evaluation posture.</p>
+<h2>What They Do Not Mean</h2>
+<p>They do not prove guaranteed legal correctness, production legal advice, live AWS health at the moment of review, or production-ready operations. Fixture-based CI does not prove deployed Bedrock, KB, SNS, or Step Functions health. Those claims would require live evidence collected under an approved run.</p>
+<h2>Technical Review Mapping</h2>
+<p>For FM evaluation, MLOps, and LLMOps review, this PoC demonstrates:</p>
+<table><thead><tr><th>Technical review expectation</th><th>Evidence in the PoC</th></tr></thead><tbody>
+<tr><td>Clear evaluation conditions</td><td>Baseline metrics config and release gate policy.</td></tr>
+<tr><td>Protected final evaluation</td><td>Final evaluation data separation and metrics-only comparison.</td></tr>
+<tr><td>Traceable release records</td><td>Approved manifest schema and validator.</td></tr>
+<tr><td>Cost-aware iteration</td><td>Cache-first playbook, replay preference, and low-KMS scratch lane.</td></tr>
+<tr><td>Responsible AI governance</td><td>Human-in-the-Loop and no-autonomous-legal-advice boundary.</td></tr>
+</tbody></table>
+<h2>Technical Traceability Appendix</h2>
+<p>The following run-condition identifiers are retained for technical reviewers who want to verify the baseline run contract. They are intentionally placed after the reader-friendly evaluation summary because they are traceability details, not the primary public-facing message.</p>
+<table><thead><tr><th>Run-condition field</th><th>Recorded value</th></tr></thead><tbody>
+<tr><td>Baseline run id</td><td><code>validation-live-20260501t003631z</code></td></tr>
+<tr><td>Runtime shadow profile</td><td><code>fo6_exact_parity</code></td></tr>
+<tr><td>Inference mode</td><td><code>SOURCE_REFRESH_LIVE</code></td></tr>
+<tr><td>Validation law execution mode</td><td><code>SCORING_LAW_ONLY</code></td></tr>
+<tr><td>Case-law retrieval mode</td><td><code>DISABLED</code></td></tr>
+<tr><td>Validation KB build status</td><td><code>REUSED_EXPLICIT_MANIFEST_VERIFIED</code></td></tr>
+<tr><td>Benchmark truth status</td><td><code>UNPOPULATED_PLACEHOLDER</code></td></tr>
+</tbody></table>
+  </main>
+</body>
+</html>

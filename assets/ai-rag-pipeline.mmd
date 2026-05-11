@@ -1,0 +1,15 @@
+flowchart TD
+  Spec["spec_text + law_scope"] --> Checklist["Checklist / Anchor / Evidence Class Extraction"]
+  Checklist --> Issues["Issue Bundle"]
+  Issues --> QueryPlan["Query Planner"]
+  QueryPlan --> Retrieve["Statute KB Retrieve"]
+  Retrieve --> Basis["Basis Selection / Evidence Sufficiency"]
+  Basis --> Adjudicate["Deterministic Law Adjudication"]
+  Adjudicate --> Recommend["Recommendation Generation"]
+  Adjudicate --> Citation["Minimal Decisive Basis / Citation Projection"]
+  Recommend --> Final["Final Law Result"]
+  Citation --> Final
+  Final --> OptionalCase{"routing == LEGAL and case-law enabled?"}
+  OptionalCase -->|yes| CaseLaw["Case Law Retrieve / Legal Support Artifact"]
+  OptionalCase -->|no| Output["Structured Audit Result"]
+  CaseLaw --> Output

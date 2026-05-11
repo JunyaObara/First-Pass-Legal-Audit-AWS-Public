@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI/RAG Design | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="ai-rag-design.md">Markdown source</a>
+    </nav>
+<h1>AI/RAG Design</h1>
+<h2>Design Goal</h2>
+<p>The AI design keeps the LLM from becoming the sole authority. The system decomposes compliance triage into checklist extraction, law-scoped retrieval, basis selection, deterministic adjudication, recommendation generation, citation projection, and Human-in-the-Loop handoff.</p>
+<p>The key design choice is that the LLM assists the review but does not become the sole decision maker. Retrieval, deterministic rules, structured outputs, and human approval all constrain the workflow.</p>
+<pre><code class="language-mermaid">flowchart TD
+  Spec[&quot;spec_text + law_scope&quot;] --&gt; Checklist[&quot;Checklist / Anchor / Evidence Class Extraction&quot;]
+  Checklist --&gt; Issues[&quot;Issue Bundle&quot;]
+  Issues --&gt; QueryPlan[&quot;Query Planner&quot;]
+  QueryPlan --&gt; Retrieve[&quot;Statute KB Retrieve&quot;]
+  Retrieve --&gt; Basis[&quot;Basis Selection / Evidence Sufficiency&quot;]
+  Basis --&gt; Adjudicate[&quot;Deterministic Law Adjudication&quot;]
+  Adjudicate --&gt; Recommend[&quot;Recommendation Generation&quot;]
+  Adjudicate --&gt; Citation[&quot;Minimal Decisive Basis / Citation Projection&quot;]
+  Recommend --&gt; Final[&quot;Final Law Result&quot;]
+  Citation --&gt; Final
+  Final --&gt; OptionalCase{&quot;routing == LEGAL and case-law enabled?&quot;}
+  OptionalCase --&gt;|yes| CaseLaw[&quot;Case Law Retrieve / Legal Support Artifact&quot;]
+  OptionalCase --&gt;|no| Output[&quot;Structured Audit Result&quot;]
+  CaseLaw --&gt; Output
+</code></pre>
+<h2>Statute-First Grounding</h2>
+<p>Statutory and regulatory text is the primary evidence lane. The statute KB contains 347 statute chunks across BIPA, CIPA, and VPPA in the inspected runtime asset. Retrieval filters by law key, document type, and unrepealed status, so a VPPA row does not casually borrow CIPA evidence and a BIPA row does not become a generic privacy search.</p>
+<p>Case-law support is separate. The inspected runtime asset contains a case-holding lane, but default validation and the standard deploy profile keep case-law disabled. When enabled, case-law retrieval is conditional support for Legal review, not a replacement for statute grounding.</p>
+<h2>Pipeline Stages</h2>
+<table><thead><tr><th>Stage</th><th>Implementation evidence</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Checklist and anchor extraction</td><td><code>identify_issues_for_law.py</code>, checklist assets, and issue-packaging modules</td><td>Convert spec text into law-specific issue states, evidence classes, and anchor terms.</td></tr>
+<tr><td>Query planning</td><td><code>analysis/query_planner.py</code></td><td>Build concise statute retrieval queries from issue flags, legal terms, section hints, and fallback terms.</td></tr>
+<tr><td>Statute retrieval</td><td><code>bedrock/kb.py</code>, <code>retrieve_statute_evidence_for_law.py</code></td><td>Retrieve law-scoped statute chunks through Bedrock KB or local/replay paths.</td></tr>
+<tr><td>Basis selection</td><td><code>analysis/rev23_adjudication.py</code> and retrieval post-processing</td><td>Select decisive sections and track sufficiency.</td></tr>
+<tr><td>Deterministic adjudication</td><td><code>determine_verdict_for_law.py</code>, <code>analysis/verdicts.py</code>, routing policy assets</td><td>Derive outcome and route from issue states, evidence quality, and recommendation mappings.</td></tr>
+<tr><td>Recommendation generation</td><td><code>analysis/recommendations.py</code></td><td>Attach remediation-oriented actions to evidence-backed findings.</td></tr>
+<tr><td>Citation projection</td><td><code>citation_projection.py</code> and finalization modules</td><td>Keep output citations minimal and tied to decisive basis sections.</td></tr>
+<tr><td>Conditional case-law support</td><td><code>retrieve_caselaw_for_legal_review.py</code></td><td>Add legal support references only when the route and run mode allow it.</td></tr>
+<tr><td>Exact prompt cache</td><td><code>bedrock/llm.py</code> and prompt cache stack</td><td>Reuse exact request envelopes to control cost and replay behavior.</td></tr>
+</tbody></table>
+<h2>Evidence Sufficiency And Conservative Routing</h2>
+<p>The inspected <code>apply_guardrails</code> logic downgrades a would-be <code>CLEARED</code> outcome when evidence is weak or mixed. That is a central responsible-AI behavior: the system should ask for review when its support is not strong enough, rather than overclaiming clearance.</p>
+<p>Routing is determined from recommendation type, law-specific overrides, and routing policies. <code>LEGAL_REVIEW</code> maps to Legal routing, while engineering and policy remediation items map to DEV or POLICY where configured. This preserves the external labels while keeping escalation logic explainable.</p>
+<h2>Why Deterministic Adjudication Matters</h2>
+<p>Pure prompt-only RAG systems often conflate retrieval, reasoning, and final routing into one opaque answer. This PoC keeps the stages inspectable: the LLM can help with structured extraction or query planning, but deterministic rules and evidence contracts decide the final workflow posture. That makes regression testing and release gating practical.</p>
+<h2>Prompt And Cache Boundary</h2>
+<p>The application cache is exact-contract caching, not semantic similarity. Cache keys are derived from normalized request envelopes, model settings, schema/tool contract, and semantic context. This supports reproducibility and cost control without pretending that similar prompts are equivalent.</p>
+<h2>Failure Modes And Mitigations</h2>
+<table><thead><tr><th>Failure mode</th><th>Mitigation in the PoC</th></tr></thead><tbody>
+<tr><td>Retrieval misses the decisive section</td><td>Query planning, fallback queries, direct basis lookups, snapshot/replay paths, and basis sufficiency tracking.</td></tr>
+<tr><td>Model output shape drifts</td><td>Structured-output parsing, contract violation observability, and fixture tests.</td></tr>
+<tr><td>Weak evidence creates false clearance</td><td>Evidence-quality guardrail moves uncertain clearance to review-needed behavior.</td></tr>
+<tr><td>Case law overwhelms statute grounding</td><td>Separate case-law lane, disabled default, and Legal-route-only support posture.</td></tr>
+<tr><td>Prompt cost grows unexpectedly</td><td>Exact app cache, token estimates, cache-miss counters, and Bedrock cost guardrails.</td></tr>
+<tr><td>Held-out leakage into tuning</td><td>Metrics-only release gate and explicit boundary policy.</td></tr>
+</tbody></table>
+<h2>Technical Framing</h2>
+<p>Explain the design as a governed RAG workflow: retrieve from a trusted evidence lane, use the model where it adds value, keep deterministic controls for final routing, and require human approval for accountable decisions. That framing maps cleanly to AWS solution architecture, Amazon Q Business-style extension patterns, and enterprise GenAI delivery.</p>
+  </main>
+</body>
+</html>

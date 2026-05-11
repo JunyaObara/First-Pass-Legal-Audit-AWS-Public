@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Governed GenAI Compliance Review Workflow on AWS</title>
+  <meta name="description" content="AWS cloud-native GenAI portfolio for a governed compliance review PoC using Amazon Bedrock Knowledge Bases for RAG, Step Functions orchestration, Human-in-the-Loop approvals, LLMOps release gates, and security-aware workflow controls.">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#top">Cloud-Native GenAI Portfolio</a>
+      <div class="nav-links">
+        <a href="#assess">90-sec view</a>
+        <a href="#value">Customer value</a>
+        <a href="#proof">Proof points</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#rag">AI/RAG</a>
+        <a href="#sa-relevance">Architecture value</a>
+        <a href="#reviewer-path">Reviewer path</a>
+      </div>
+    </nav>
+  </header>
+
+  <section id="top" class="hero">
+    <div class="hero-copy">
+      <div class="section-eyebrow">Cloud-Native GenAI Architecture Portfolio</div>
+      <h1>Governed GenAI Compliance Review Workflow on AWS</h1>
+      <p class="subtitle">A cloud-native PoC for first-pass compliance triage across globally delivered software using Amazon Bedrock Knowledge Bases for RAG, Step Functions orchestration, Human-in-the-Loop approvals, LLMOps release gates, and security-aware workflow controls.</p>
+      <p class="boundary-line">First-pass triage, not autonomous legal advice. The system prepares evidence-backed routing; final legal and business judgment remains Human-in-the-Loop.</p>
+      <div class="cta-row" aria-label="Primary portfolio documents">
+        <a class="button primary" href="docs/architecture-deep-dive.html">Architecture Deep Dive</a>
+        <a class="button secondary" href="docs/ai-rag-design.html">AI/RAG Design</a>
+        <a class="button secondary" href="docs/evaluation-and-llmops.html">Evaluation &amp; LLMOps</a>
+        <a class="button secondary" href="docs/security-and-responsible-ai.html">Security Posture</a>
+        <a class="button secondary" href="docs/customer-adoption-roadmap.html">Adoption Roadmap</a>
+        <a class="button secondary" href="docs/aws-well-architected-mapping.html">Well-Architected Mapping</a>
+      </div>
+    </div>
+    <aside class="hero-panel boundary-card" aria-label="Portfolio boundaries">
+      <span class="status-badge">Public portfolio layer</span>
+      <h2>Governed Architecture, Not A Legal Engine</h2>
+      <p><strong>Built by Junya Obara</strong> as a self-initiated AWS GenAI PoC to demonstrate customer-backward problem framing, Amazon Bedrock Knowledge Bases RAG design, event-driven AWS architecture, Human-in-the-Loop governance, and evaluation-aware LLMOps.</p>
+      <p>This public site summarizes the architecture, evaluation approach, and responsible AI boundaries of the PoC. The implementation is treated as a governed software workflow, not as an autonomous legal decision engine.</p>
+      <p>The PoC demonstrates first-pass triage and evidence preparation. Production deployment would require additional enterprise identity, access control, monitoring, and operational hardening.</p>
+    </aside>
+  </section>
+
+  <main>
+    <section id="assess">
+      <div class="section-heading">
+        <span class="section-eyebrow">Fast Technical Signal</span>
+        <h2>Readers Can Assess In 90 Seconds</h2>
+        <p>The sample domain is compliance review, but the transferable signal is broader: how to design a governed GenAI workflow for high-risk enterprise decisions using AWS architecture, RAG, human accountability, evaluation discipline, security posture, and business value framing.</p>
+      </div>
+      <div class="capability-grid">
+        <article class="card">
+          <span class="badge">Customer value</span>
+          <h3>Increase review coverage while reducing expert workload</h3>
+          <p>For regulated companies releasing software globally, this PoC helps surface privacy and compliance issues during specification writing. It does not replace legal judgment; it reduces reviewer workload and late-stage rework.</p>
+        </article>
+        <article class="card">
+          <span class="badge">AWS architecture</span>
+          <h3>Cloud-native workflow</h3>
+          <p>S3 and EventBridge decouple intake, Step Functions makes review and approval visible and retryable, Lambda isolates each stage, Bedrock Knowledge Bases grounds retrieval, and DynamoDB/S3 preserve state and evidence.</p>
+        </article>
+        <article class="card">
+          <span class="badge">GenAI/RAG</span>
+          <h3>RAG with legal provenance</h3>
+          <p>Statute-first, law-scoped retrieval with separate statute and case-law lanes. Case-law support remains conditional for Legal review rather than the default source of truth.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Responsible AI</span>
+          <h3>Human-in-the-Loop control</h3>
+          <p>Engineering review is required, Legal review is conditional, and Business approval is required. AI prepares evidence and routing; humans remain accountable for decisions.</p>
+        </article>
+        <article class="card">
+          <span class="badge">LLMOps</span>
+          <h3>Release discipline</h3>
+          <p>Validation stages, baseline metrics, release gates, and traceable release records keep quality claims tied to measurable evidence rather than demo-only impressions.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Security</span>
+          <h3>Encryption and approval security</h3>
+          <p>Core S3 buckets and prompt cache use SSE-KMS, DynamoDB workflow state is encrypted, approval signing material is stored in Secrets Manager, and CloudWatch plus optional CloudTrail support operational visibility and audit review.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="problem" class="split-panel">
+      <div>
+        <span class="section-eyebrow">Customer Problem</span>
+        <h2>Global Software Delivery Creates A Compliance Review Bottleneck</h2>
+        <p>Companies that ship products, platforms, apps, APIs, and data-driven features across markets often face privacy and compliance review across jurisdictions. Review can become a late-stage bottleneck when issues are discovered after specifications are already mature.</p>
+        <p>This PoC was motivated by the kind of review bottleneck that appears in Automotive / SDV delivery: frequent software specification changes, region-specific rollout constraints, privacy-sensitive connected services, and the need to coordinate engineering, legal, and business owners before launch.</p>
+        <p>The customer value is not automated legal judgment. The value is shifting review left: use GenAI to prepare a grounded first pass, surface ambiguous or high-risk requirements earlier, route the right items to the right owners, and reduce downstream rework while preserving human accountability.</p>
+      </div>
+      <div class="truth-card">
+        <h3>Core Contract</h3>
+        <ul>
+          <li>Inputs are software-spec fragments and law scope.</li>
+          <li>Outputs are first-pass triage, evidence, routing, and recommendations.</li>
+          <li>External labels stay limited to <code>BLOCKER</code>, <code>NEEDS_REVIEW</code>, and <code>CLEARED</code>.</li>
+          <li>Final judgment remains Human-in-the-Loop.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="value">
+      <div class="section-heading">
+        <span class="section-eyebrow">Why This Is Worth Solving</span>
+        <h2>From Field Problem To AWS GenAI Architecture</h2>
+        <p>The strongest architectural signal is the bridge from customer pain to a practical cloud design. This PoC starts from a concrete global software review challenge and turns it into a governed AWS workflow pattern.</p>
+      </div>
+      <div class="value-grid">
+        <article class="card">
+          <span class="badge">Field importance</span>
+          <h3>Global software creates repeated review load</h3>
+          <p>Privacy-impacting features, analytics, AI capabilities, media flows, user profiles, integrations, and cross-border data handling can trigger review across jurisdictions. Manual review does not disappear, but it should focus on the hardest decisions.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Traditional limit</span>
+          <h3>Manual review is hard to scale and reproduce</h3>
+          <p>Spreadsheets and ad hoc document review can miss early signals, make reviewer rationale hard to reuse, and leave teams without a consistent way to compare changes over time.</p>
+        </article>
+        <article class="card">
+          <span class="badge">AWS value</span>
+          <h3>Managed RAG plus workflow state creates leverage</h3>
+          <p>Bedrock Knowledge Bases provide grounded retrieval, Step Functions makes the review path visible, S3/DynamoDB preserve evidence and state, and SNS/API Gateway support human review integration.</p>
+        </article>
+        <article class="card">
+          <span class="badge">PoC question</span>
+          <h3>Can first-pass review become measurable?</h3>
+          <p>The PoC validates whether specifications can be triaged into outcomes, review routes, and evidence packages under defined validation conditions, without using the LLM as the sole authority.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="proof">
+      <div class="section-heading">
+        <span class="section-eyebrow">Evidence Snapshot</span>
+        <h2>Source-Backed PoC Proof Points</h2>
+        <p>These figures are public-safe summaries from the documented PoC baseline and retrieval assets. They are presented as validation evidence for the portfolio, not as a production SLA.</p>
+      </div>
+      <div class="metric-grid">
+        <article class="metric-card"><span>3</span><p>Laws in scope: BIPA, CIPA, and VPPA</p></article>
+        <article class="metric-card"><span>347</span><p>Curated statute chunks available to the retrieval layer</p></article>
+        <article class="metric-card"><span>42</span><p>Held-out samples in the documented PoC baseline</p></article>
+        <article class="metric-card"><span>80.95%</span><p>Outcome match in the documented PoC baseline (34 of 42 samples)</p></article>
+        <article class="metric-card"><span>78.57%</span><p>Review-route match in the documented PoC baseline (33 of 42 samples)</p></article>
+        <article class="metric-card"><span>82.58%</span><p>Grounding F1@20 in the documented PoC baseline (evidence-ranking F1 score)</p></article>
+      </div>
+      <div class="term-grid" aria-label="Privacy law acronym glossary">
+        <article class="truth-card"><h3>BIPA</h3><p>Illinois Biometric Information Privacy Act. Used here as an example of biometric-data compliance review.</p></article>
+        <article class="truth-card"><h3>CIPA</h3><p>California Invasion of Privacy Act. Used here as an example of communications and privacy-related issue spotting.</p></article>
+        <article class="truth-card"><h3>VPPA</h3><p>Video Privacy Protection Act. Used here as an example of media and viewing-history privacy review.</p></article>
+      </div>
+      <p class="proof-strip">Grounding F1@20 compares the top evidence sections returned by the system with the expected evidence sections; it is not a simple item-level accuracy.</p>
+      <p class="proof-strip">Metrics are PoC validation results from a documented held-out baseline. They show measurable behavior under one test setup; they are not a production SLA and do not prove legal correctness or production readiness.</p>
+    </section>
+
+    <section id="architecture">
+      <div class="section-heading">
+        <span class="section-eyebrow">AWS Architecture</span>
+        <h2>Event-Driven GenAI Review Workflow</h2>
+        <p>S3 and EventBridge decouple specification intake from orchestration. Step Functions makes audit, validation, and approval workflows visible and retryable. Lambda stages isolate validation, retrieval, verdicting, finalization, approval, and notification. Bedrock Knowledge Bases and OpenSearch Serverless support grounded retrieval; Bedrock Runtime supports selected LLM-assisted stages. DynamoDB, S3, SNS, API Gateway, KMS, CloudWatch, and optional CloudTrail provide state, evidence storage, approval integration, security controls, and observability.</p>
+      </div>
+      <figure class="arch-diagram" aria-label="PoC architecture diagram showing S3 input, EventBridge trigger, Step Functions audit workflow, Lambda stages, Bedrock Knowledge Bases, S3 state, and approval orchestration.">
+        <img src="assets/poc-architecture.png" alt="PoC Architecture diagram for the event-driven GenAI compliance review workflow on AWS, including S3 input, EventBridge, Step Functions, Lambda stages, Amazon Bedrock Knowledge Bases, S3 state, SNS notifications, Human-in-the-Loop approvals, IAM, KMS, CloudWatch, and CloudTrail.">
+      </figure>
+      <div class="architecture-callout">
+        <h3>Why This Architecture Matters</h3>
+        <div class="reason-grid">
+          <p><strong>EventBridge</strong> decouples S3 ingestion from orchestration and keeps event payloads explicit.</p>
+          <p><strong>Step Functions</strong> makes long-running audit, validation, and approval workflows visible, retryable, and explainable.</p>
+          <p><strong>Lambda stage isolation</strong> keeps validation, retrieval, verdicting, approval, and notification boundaries inspectable.</p>
+          <p><strong>Bedrock Knowledge Bases</strong> provide a managed statute-grounded retrieval path while preserving retrieval provenance.</p>
+          <p><strong>S3 and DynamoDB</strong> preserve evidence artifacts, run state, approval tasks, and idempotency state.</p>
+          <p><strong>KMS, CloudWatch, SNS, and API Gateway</strong> support encryption posture, observability, notifications, and review workflow integration.</p>
+        </div>
+      </div>
+      <div class="decision-grid">
+        <article class="card">
+          <span class="badge">Why Bedrock KB</span>
+          <h3>Grounding changes faster than the model</h3>
+          <p>Legal and policy sources change by jurisdiction and domain. Keeping them in a retrieval layer makes citations, updates, and expansion easier than relying on a foundation model's internal knowledge.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Why not model-only</span>
+          <h3>Answers need reviewable evidence</h3>
+          <p>A direct model answer can be quick, but reviewers need to inspect the statute basis. RAG gives the workflow a concrete evidence object to store, evaluate, and route.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Why not fine-tune first</span>
+          <h3>The first risk is provenance, not style</h3>
+          <p>Fine-tuning may help fixed patterns later, but this PoC needs law updates, law-scope filters, and citation-backed triage before optimizing model behavior.</p>
+        </article>
+      </div>
+      <div class="pill-row" aria-label="AWS services represented in the architecture">
+        <span class="pill">S3</span><span class="pill">EventBridge</span><span class="pill">Step Functions</span><span class="pill">Lambda</span><span class="pill">Bedrock Knowledge Bases</span><span class="pill">Bedrock Runtime</span><span class="pill">OpenSearch Serverless</span><span class="pill">DynamoDB</span><span class="pill">SNS</span><span class="pill">API Gateway</span><span class="pill">KMS</span><span class="pill">CloudWatch</span>
+      </div>
+    </section>
+
+    <section id="rag">
+      <div class="section-heading">
+        <span class="section-eyebrow">GenAI/RAG Design</span>
+        <h2>LLM-Assisted, Contract-Controlled Pipeline</h2>
+        <p>The AI path decomposes compliance triage into inspectable stages. The LLM assists selected extraction and planning tasks; deterministic contracts and evidence rules control final routing.</p>
+      </div>
+      <div class="flow" aria-label="AI and RAG pipeline stages">
+        <span>Spec input</span>
+        <span>Checklist / issue extraction</span>
+        <span>Query planning</span>
+        <span>Law-scoped statute retrieval</span>
+        <span>Basis selection / evidence sufficiency</span>
+        <span>Deterministic adjudication</span>
+        <span>Recommendations</span>
+        <span>Citation projection</span>
+        <span>Conditional case-law support for Legal review only</span>
+        <span>Structured audit result</span>
+      </div>
+      <div class="callout">LLM assists selected stages; deterministic contracts and evidence rules control final routing.</div>
+      <div class="decision-grid">
+        <article class="card">
+          <span class="badge">Why checklist extraction</span>
+          <h3>Turn ambiguous specs into reviewable issues</h3>
+          <p>The system first maps a free-form specification into law-specific anchors, evidence classes, and checklist states so later stages have explicit inputs.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Why law-scoped retrieval</span>
+          <h3>Prevent cross-law evidence drift</h3>
+          <p>Queries are scoped by law and evidence lane so a VPPA row does not casually borrow CIPA evidence, and statute grounding remains primary.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Why deterministic adjudication</span>
+          <h3>Keep final routing testable</h3>
+          <p>The LLM can help with extraction and planning, but outcome labels, review routes, weak-evidence handling, and recommendations are controlled by deterministic contracts.</p>
+        </article>
+        <article class="card">
+          <span class="badge">Why case-law is conditional</span>
+          <h3>Support Legal review without replacing statutes</h3>
+          <p>Case-law retrieval is separated and used as Legal-review support when enabled; it is not treated as the default primary evidence source.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="governance" class="split-panel">
+      <div>
+        <span class="section-eyebrow">Evaluation &amp; Release Governance</span>
+        <h2>LLMOps Discipline Beyond A Demo</h2>
+        <p>The PoC treats evaluation as a release decision, not as an after-the-fact demo score. Candidate changes are compared against defined validation conditions, baseline metrics, and release gates before stronger claims are made.</p>
+        <p>Held-out data is kept separate from day-to-day tuning. CI checks support repeatable governance checks, but they are not presented as proof of live AWS health.</p>
+      </div>
+      <div class="truth-card">
+        <h3>Validation Ladder</h3>
+        <ol>
+          <li>Replay and artifact comparison</li>
+          <li>Targeted slice</li>
+          <li>Random slice</li>
+          <li>Full validation</li>
+          <li>Held-out confirmation as final gate</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="sa-relevance">
+      <div class="section-heading">
+        <span class="section-eyebrow">AI Solution Architect Signal</span>
+        <h2>Why This Matters For AI Solution Architect Roles</h2>
+        <p>This PoC shows how an ambiguous, high-risk business workflow can be translated into a practical AWS GenAI architecture with measurable quality controls and responsible production boundaries.</p>
+      </div>
+      <div class="mapping-table" role="table" aria-label="AWS GenAI architecture relevance mapping">
+        <div role="row"><strong role="cell">Customer problem framing</strong><span role="cell">Translates global software compliance bottlenecks into a measurable first-pass workflow contract.</span></div>
+        <div role="row"><strong role="cell">AWS service selection</strong><span role="cell">Uses event-driven, serverless orchestration with managed retrieval and stateful approvals.</span></div>
+        <div role="row"><strong role="cell">GenAI grounding</strong><span role="cell">Applies Amazon Bedrock Knowledge Bases, statute-first RAG, law-scoped filters, and evidence packaging.</span></div>
+        <div role="row"><strong role="cell">Workflow integration</strong><span role="cell">Models approval state, notifications, API callback patterns, and stakeholder handoff.</span></div>
+        <div role="row"><strong role="cell">Governance</strong><span role="cell">Uses validation stages, metrics-based release gates, traceable release records, and final evaluation data kept separate from tuning.</span></div>
+        <div role="row"><strong role="cell">Security</strong><span role="cell">Models encrypted storage, managed signing, approval-state protection, observability, and the additional controls needed before enterprise production use.</span></div>
+        <div role="row"><strong role="cell">Adoption strategy</strong><span role="cell">Frames discovery, pilot, validate, productionize, scale, and Amazon Q Business-style extension points without claiming current Amazon Q implementation.</span></div>
+      </div>
+    </section>
+
+    <section id="quick-path" class="split-panel">
+      <div>
+        <span class="section-eyebrow">Suggested Review Path</span>
+        <h2>A Concise Way To Review The Portfolio</h2>
+        <p>If helpful, the following path provides a quick way to understand the project before a technical review.</p>
+      </div>
+      <div class="truth-card">
+        <ol>
+          <li>30 sec: read the top-page summary and held-out metrics.</li>
+          <li>3 min: open the architecture deep dive.</li>
+          <li>5 min: review evaluation and LLMOps.</li>
+          <li>Deep dive: inspect AI/RAG design and security / Responsible AI.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="amazon-q" class="split-panel">
+      <div>
+        <span class="section-eyebrow">Enterprise GenAI Extension</span>
+        <h2>Amazon Q Business / Enterprise GenAI Relevance</h2>
+        <p>This repository does not implement Amazon Q. It demonstrates a governed enterprise GenAI workflow pattern that could be extended to Amazon Q Business-style workflows where teams need grounded knowledge, enterprise identity, workflow integration, approval routing, evaluation gates, and ROI-focused rollout.</p>
+      </div>
+      <div class="truth-card">
+        <h3>Correct Claim</h3>
+        <p>The transferable pattern is not a product claim. The PoC shows architecture and governance decisions that are relevant to enterprise assistant workflows, while keeping current implementation boundaries explicit.</p>
+      </div>
+    </section>
+
+    <section id="boundaries">
+      <div class="section-heading">
+        <span class="section-eyebrow">Scope And Limits</span>
+        <h2>What This PoC Does And Does Not Claim</h2>
+      </div>
+      <div class="boundary-grid">
+        <article class="boundary-card"><h3>Public layer only</h3><p>This repository is the portfolio presentation layer. It does not claim to contain the full application implementation source.</p></article>
+        <article class="boundary-card"><h3>Not legal advice</h3><p>This is first-pass compliance triage, not autonomous legal advice. Final legal and business judgment remains Human-in-the-Loop.</p></article>
+        <article class="boundary-card"><h3>Not guaranteed correctness</h3><p>Metrics show PoC validation behavior under a documented test setup; they do not prove legal correctness for every real-world scenario.</p></article>
+        <article class="boundary-card"><h3>Not production-ready</h3><p>The PoC is a security-aware architecture demonstration. Enterprise production use would require additional identity, access, monitoring, networking, and operations controls.</p></article>
+        <article class="boundary-card"><h3>Not Amazon Q implementation</h3><p>The pattern could be extended to Amazon Q Business-style workflows, but this repository does not implement Amazon Q.</p></article>
+        <article class="boundary-card"><h3>Public portfolio layer</h3><p>The public site presents architecture diagrams, evaluation summaries, and governance boundaries. Operational secrets, raw test data, and private runtime artifacts are intentionally not published.</p></article>
+      </div>
+    </section>
+
+    <section id="reviewer-path">
+      <div class="section-heading">
+        <span class="section-eyebrow">Recommended Reviewer Path</span>
+        <h2>Inspect The Portfolio In A Practical Order</h2>
+      </div>
+      <div class="reviewer-path">
+        <a href="docs/architecture-deep-dive.html"><span>1</span><strong>Architecture Deep Dive</strong><p>Start with AWS orchestration, service responsibilities, approval flow, and enterprise hardening considerations.</p></a>
+        <a href="docs/ai-rag-design.html"><span>2</span><strong>AI/RAG Design</strong><p>Review statute-first RAG, law-scoped retrieval, deterministic adjudication, and failure mitigations.</p></a>
+        <a href="docs/evaluation-and-llmops.html"><span>3</span><strong>Evaluation &amp; LLMOps</strong><p>Check the validation stages, baseline metrics, release gate, and traceable release records.</p></a>
+        <a href="docs/security-and-responsible-ai.html"><span>4</span><strong>Security &amp; Responsible AI</strong><p>Confirm public-safe evidence boundaries, HITL posture, encryption posture, and enterprise hardening considerations.</p></a>
+        <a href="docs/customer-adoption-roadmap.html"><span>5</span><strong>Customer Adoption Roadmap</strong><p>Review how the PoC can move from discovery to pilot, validation, production hardening, and scale.</p></a>
+        <a href="docs/aws-well-architected-mapping.html"><span>6</span><strong>Well-Architected Mapping</strong><p>Check how the PoC maps to operational excellence, security, reliability, performance, cost, and sustainability.</p></a>
+      </div>
+    </section>
+
+    <section id="evidence">
+      <div class="section-heading">
+        <span class="section-eyebrow">Supporting Evidence</span>
+        <h2>Grouped Portfolio Documents</h2>
+      </div>
+      <div class="evidence-groups">
+        <article>
+          <h3>Architecture</h3>
+          <a href="docs/architecture-deep-dive.html">Architecture deep dive</a>
+          <a href="docs/customer-adoption-roadmap.html">Customer adoption roadmap</a>
+        </article>
+        <article>
+          <h3>AI/RAG</h3>
+          <a href="docs/ai-rag-design.html">AI/RAG design</a>
+          <a href="docs/faq-and-challenges.html">FAQ and challenges</a>
+        </article>
+        <article>
+          <h3>Evaluation &amp; LLMOps</h3>
+          <a href="docs/evaluation-and-llmops.html">Evaluation and LLMOps</a>
+          <a href="docs/governed-genai-rag-article.html">Technical article: governed GenAI RAG workflows</a>
+        </article>
+        <article>
+          <h3>Security</h3>
+          <a href="docs/security-and-responsible-ai.html">Security and Responsible AI</a>
+        </article>
+        <article>
+          <h3>Enterprise GenAI</h3>
+          <a href="docs/amazon-q-relevance.html">Amazon Q Business / Enterprise GenAI relevance</a>
+        </article>
+        <article>
+          <h3>Mermaid Diagram Sources</h3>
+          <a href="assets/architecture-overview.mmd">Architecture Mermaid source</a>
+          <a href="assets/ai-rag-pipeline.mmd">AI/RAG Mermaid source</a>
+          <a href="assets/release-governance.mmd">Release governance Mermaid source</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="roadmap" class="split-panel">
+      <div>
+        <span class="section-eyebrow">Productionization Roadmap</span>
+        <h2>What Would Be Hardened Next</h2>
+        <p>The next production step is not more marketing polish. It is operational hardening: IAM role separation, enterprise identity, WAF/auth/rate limiting, private access, monitoring, cost alerts, incident runbooks, CI/CD promotion gates, and per-domain evaluation ownership.</p>
+      </div>
+      <div class="truth-card">
+        <h3>Scale Pattern</h3>
+        <p>Reusable workflow templates, domain-owned knowledge lanes, per-domain evaluation, release-record promotion, and Amazon Q Business-style enterprise extensions can generalize the pattern beyond this legal-domain sample.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Prepared as a public technical portfolio for the AWS CloudNative GenAI compliance review PoC. The site summarizes architecture, evaluation, Responsible AI boundaries, and production-readiness considerations.
+  </footer>
+</body>
+</html>

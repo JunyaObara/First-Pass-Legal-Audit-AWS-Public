@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Security And Responsible AI | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="security-and-responsible-ai.md">Markdown source</a>
+    </nav>
+<h1>Security And Responsible AI</h1>
+<h2>Correct Security Positioning</h2>
+<p>This document explains how this security-aware PoC treats security as part of the workflow design: protecting review inputs, evidence, approval state, and evaluation artifacts while keeping final decisions accountable to humans.</p>
+<p>The PoC is not presented as production-ready security. A production version would require a production hardening backlog covering identity, access, network, monitoring, secret rotation, key policies, and operational controls.</p>
+<h2>Current Security-Aware Controls</h2>
+<table><thead><tr><th>Area</th><th>Source-backed posture</th></tr></thead><tbody>
+<tr><td>S3 encryption</td><td>Core buckets use SSE-KMS with bucket keys, block public access, versioning, SSL enforcement, and retain policies.</td></tr>
+<tr><td>Prompt cache</td><td>The prompt cache bucket uses SSE-KMS, bucket keys, versioning, SSL enforcement, and retain policy.</td></tr>
+<tr><td>Validation scratch</td><td>The low-KMS scratch stack intentionally uses SSE-S3, lifecycle expiration, SSL enforcement, and block public access for validation-only high-churn artifacts.</td></tr>
+<tr><td>DynamoDB</td><td>Audit, approval, and idempotency tables use customer-managed encryption, pay-per-request billing, retain policy, and PITR where implemented.</td></tr>
+<tr><td>Secrets</td><td>A managed signing secret is created through Secrets Manager for approval review and callback verification.</td></tr>
+<tr><td>Approval path</td><td>The approval flow includes signed review context, replay-resistant guard data, expiry handling, human confirmation, and task state storage.</td></tr>
+<tr><td>Observability</td><td>CloudWatch dashboards, alarms, log query definitions, X-Ray tracing, and optional CloudTrail are implemented in the core stack.</td></tr>
+<tr><td>Public artifact boundary</td><td>Public materials use diagrams, summaries, metrics, and redacted explanations. They do not publish sensitive runtime data, credentials, active approval links, raw prompts, prompt-cache contents, or final evaluation rows.</td></tr>
+</tbody></table>
+<h2>Responsible AI Boundary</h2>
+<p>This is not autonomous legal advice. It is a first-pass compliance triage PoC that supports issue spotting, evidence grounding, routing, recommendations, and approval evidence. Final legal and business judgment remains Human-in-the-Loop.</p>
+<h2>Evidence Lane Separation</h2>
+<p>Statute retrieval and case-law retrieval remain separate. Statutory text is primary. Case-law retrieval is secondary, conditional, and intended as Legal-review support. This helps prevent a model response from turning a secondary interpretation artifact into the apparent source of truth.</p>
+<h2>IAM Visibility</h2>
+<p>The repository includes a warning-only static checker for broad permissions and public network-policy indicators. This is useful posture visibility, but it is not a production security scanner. Broad lifecycle permissions remain an enterprise hardening item unless tightly justified by AWS service semantics.</p>
+<h2>Enterprise Production Hardening Roadmap</h2>
+<table><thead><tr><th>Area</th><th>Additional hardening before production use</th></tr></thead><tbody>
+<tr><td>IAM</td><td>Split deployment, runtime, validation, and operator roles; scope runtime access to specific buckets, prefixes, tables, topics, and state machines; add permission boundaries and IAM Access Analyzer review.</td></tr>
+<tr><td>Network</td><td>Add WAF, authenticated approval access, rate limiting, private access where appropriate, and VPC endpoints for enterprise network posture.</td></tr>
+<tr><td>Secrets</td><td>Add rotation policy, audit secret access, and narrow secret-read permissions.</td></tr>
+<tr><td>KMS</td><td>Review key policies, separate keys by environment and sensitivity where justified, and alert on unusual KMS errors or cost patterns.</td></tr>
+<tr><td>S3 data governance</td><td>Add lifecycle and retention policies by artifact class; add sensitive-data discovery such as Macie where appropriate.</td></tr>
+<tr><td>DynamoDB</td><td>Review TTL, PITR, backups, and table-level IAM.</td></tr>
+<tr><td>Monitoring</td><td>Add latency, cost, quality, approval SLA, and drift dashboards with operational runbooks.</td></tr>
+<tr><td>Release operations</td><td>Promote only validated manifests through environment-specific deployment controls.</td></tr>
+</tbody></table>
+<h2>Public Review Boundary</h2>
+<p>The public portfolio uses diagrams, architecture summaries, metrics summaries, and governance explanations. It does not publish private runtime data, final evaluation rows, prompt bodies, model transcripts, active review links, callback payloads, browser cookies, cloud account identifiers, or generated credentials.</p>
+  </main>
+</body>
+</html>

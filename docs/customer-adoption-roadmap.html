@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Customer Adoption Roadmap | CloudNative GenAI Compliance Review</title>
+  <meta name="description" content="Public supporting document for the CloudNative GenAI Compliance Review on AWS portfolio.">
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="doc-page">
+  <main class="doc-shell">
+    <nav class="doc-nav" aria-label="Document navigation">
+      <a href="../index.html">Back to overview</a>
+      <a href="customer-adoption-roadmap.md">Markdown source</a>
+    </nav>
+<h1>Customer Adoption Roadmap</h1>
+<h2>Roadmap Overview</h2>
+<p>This roadmap frames the PoC as an enterprise GenAI adoption motion suitable for technical architecture and platform strategy discussions.</p>
+<table><thead><tr><th>Phase</th><th>Customer objective</th><th>AWS / GenAI activities</th><th>Stakeholders</th><th>Outputs</th><th>Success metrics</th><th>Risks and mitigations</th></tr></thead><tbody>
+<tr><td>Discover</td><td>Find a workflow where first-pass review creates measurable business value.</td><td>Run use-case discovery, pain-point mapping, data-source inventory, risk classification, and value hypothesis.</td><td>Executive sponsor, legal/compliance, security, app owner, data owner, AWS account team.</td><td>Prioritized use-case brief and success criteria.</td><td>Estimated cycle-time reduction, reviewer effort saved, risk reduction hypothesis.</td><td>Risk: vague use case. Mitigation: force a narrow input/output contract and decision owner.</td></tr>
+<tr><td>Align</td><td>Turn ambiguity into an architecture and governance plan.</td><td>Define knowledge lanes, identity boundaries, approval workflow, evaluation ladder, and enterprise hardening considerations.</td><td>Architecture, platform, security, legal, business owner.</td><td>Solution architecture, threat assumptions, evaluation plan, rollout plan.</td><td>Stakeholder sign-off on boundaries and non-goals.</td><td>Risk: overclaiming automation. Mitigation: explicitly preserve Human-in-the-Loop.</td></tr>
+<tr><td>Pilot</td><td>Build a narrow PoC with real workflow shape.</td><td>Implement S3/EventBridge/Step Functions/Lambda/Bedrock retrieval, DynamoDB state, SNS approvals, and artifact storage.</td><td>Builder team, domain SMEs, security reviewer.</td><td>Working pilot, diagrams, runbook, and discussion guide.</td><td>Successful end-to-end sample, clear evidence artifacts, reviewer feedback.</td><td>Risk: demo drift. Mitigation: cache-first runs and source-backed evidence.</td></tr>
+<tr><td>Validate</td><td>Prove the PoC is measurable before adoption claims.</td><td>Use replay, targeted slices, random slices, full validation, metrics-only release gate, and traceable release records.</td><td>AI engineer, evaluator owner, compliance reviewer, product owner.</td><td>Scorecards, release gate report, release record outline.</td><td>Metrics meet baseline or documented gap with no major regression.</td><td>Risk: tuning on final test data. Mitigation: final evaluation data stays separate from iterative tuning.</td></tr>
+<tr><td>Productionize</td><td>Harden for enterprise operation.</td><td>Split IAM roles, add WAF/auth/rate limiting, private access, monitoring, cost alerts, incident runbooks, identity integration, and CI/CD promotion gates.</td><td>Platform, security, SRE, compliance, business owner.</td><td>Production design package, hardening plan, launch readiness review.</td><td>Security review passed, SLOs defined, operational ownership assigned.</td><td>Risk: PoC shortcuts leak into production. Mitigation: hardening items tracked as release blockers.</td></tr>
+<tr><td>Scale</td><td>Reuse the blueprint across workflows and teams.</td><td>Add tenant/domain configuration, reusable evaluation patterns, knowledge-source governance, and workshop assets.</td><td>Executive sponsor, CoE, delivery partner, customer success, app teams.</td><td>Reusable GenAI workflow blueprint and adoption playbook.</td><td>Number of workflows onboarded, quality trend, cost per review, reviewer satisfaction.</td><td>Risk: one-size-fits-all rollout. Mitigation: per-domain evaluation and ownership remain explicit.</td></tr>
+</tbody></table>
+<h2>Executive Summary</h2>
+<p>The strongest customer story is disciplined: start with a high-friction review workflow, use GenAI to prepare a grounded first pass, keep human owners accountable for decisions, measure quality before rollout, and productionize only after security and operations are ready.</p>
+  </main>
+</body>
+</html>
